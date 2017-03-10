@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import io.github.akameco.qiitax.R;
 import io.github.akameco.qiitax.model.Item;
+import io.github.akameco.qiitax.model.Tag;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
 	private final Context mContext;
@@ -54,13 +56,15 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 		TextView mTextView;
 		ImageView mAvater;
 		TextView mSubTitle;
+		ListView mTabs;
+		TextView mTagNames;
 
 		ItemViewHolder(final View itemView) {
 			super(itemView);
 			// TODO data binding
 			mTextView = (TextView) itemView.findViewById(R.id.tv_name);
 			mAvater = (ImageView) itemView.findViewById(R.id.avater);
-			mSubTitle = (TextView) itemView.findViewById(R.id.tv_sub_title);
+			mTagNames = (TextView) itemView.findViewById(R.id.tv_tags);
 
 			itemView.setOnClickListener(v -> {
 				int position = getAdapterPosition();
@@ -73,11 +77,21 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 
 		void bind(int position) {
 			Item item = list.get(position);
-			String imageUrl = item.user.profile_image_url;
 			mTextView.setText(item.title);
-			mSubTitle.setText(item.url);
+
+			String imageUrl = item.user.profile_image_url;
 			if (imageUrl != null) {
 				Picasso.with(mContext).load(imageUrl).into(mAvater);
+			}
+
+			// TODO: 横に並べるリストにしたい
+			if (item.tags.size() > 0) {
+				StringBuilder stringBuilder = new StringBuilder();
+				for (Tag tag:item.tags) {
+					stringBuilder.append(tag.name);
+					stringBuilder.append(" / ");
+				}
+				mTagNames.setText(stringBuilder.toString());
 			}
 		}
 	}
