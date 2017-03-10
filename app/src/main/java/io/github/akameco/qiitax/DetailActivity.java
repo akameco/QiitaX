@@ -23,6 +23,7 @@ public class DetailActivity extends AppCompatActivity {
 
 		initView();
 	}
+
 	private void initView() {
 		mBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 		Intent intent = getIntent();

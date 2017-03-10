@@ -8,6 +8,7 @@ import android.util.Log;
 
 import java.util.List;
 
+import io.github.akameco.qiitax.adapter.ItemAdapter;
 import io.github.akameco.qiitax.api.QiitaService;
 import io.github.akameco.qiitax.model.Item;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -56,13 +57,14 @@ public class MainActivity extends AppCompatActivity {
 
 	private void loadRepos(Retrofit retrofit) {
 		QiitaService qiitaService = retrofit.create(QiitaService.class);
-		qiitaService.items("android")
+		qiitaService.items("android", null, null)
 			.subscribeOn(Schedulers.io())
 			.observeOn(AndroidSchedulers.mainThread())
 			.subscribe(this::render, this::errorHandler);
 	}
 
 	private void errorHandler(Throwable t) {
+		t.printStackTrace();
 		Log.d(TAG, String.valueOf(t));
 	}
 
