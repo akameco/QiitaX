@@ -2,7 +2,6 @@ package io.github.akameco.qiitax.adapter;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
@@ -18,7 +17,6 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.akameco.qiitax.DetailActivity;
 import io.github.akameco.qiitax.R;
 import io.github.akameco.qiitax.model.Item;
 
@@ -67,13 +65,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 			itemView.setOnClickListener(v -> {
 				int position = getAdapterPosition();
 				Item item = list.get(position);
-				Intent intent = new Intent(mContext, DetailActivity.class);
 				CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
 				CustomTabsIntent customTabsIntent = builder.build();
 				customTabsIntent.launchUrl(mContext, Uri.parse(item.url));
-//				intent.putExtra(DetailActivity.TITLE, item.title);
-//				intent.putExtra(DetailActivity.BODY, item.body);
-//				mContext.startActivity(intent);
 			});
 		}
 
