@@ -1,6 +1,5 @@
 package io.github.akameco.qiitax.api;
 
-
 import java.util.List;
 
 import io.github.akameco.qiitax.model.Item;

@@ -1,3 +1,5 @@
 <resources>
 	<string name="app_name">QiitaX</string>
+	<string name="close">Close</string>
+	<string name="search">検索</string>
 </resources>

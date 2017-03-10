@@ -1,10 +1,14 @@
 package io.github.akameco.qiitax;
 
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import java.util.List;
 
@@ -16,38 +20,42 @@ import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
 	public static final String TAG = MainActivity.class.getSimpleName();
 	public static final String API_URL = "https://qiita.com";
-	RecyclerView mRecyclerView;
+
 	private ItemAdapter mAdapter;
+	private Retrofit mRetrofit;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-
 		initView();
 
-		Retrofit retrofit = new Retrofit
+		mRetrofit = new Retrofit
 			.Builder()
 			.baseUrl(API_URL)
 			.addConverterFactory(GsonConverterFactory.create())
 			.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 			.build();
 
-		loadRepos(retrofit);
+		// TODO 前回の値をプリファレンスに保存
+		String firstQuery = "android";
+		loadItems(firstQuery);
 	}
 
 	private void initView() {
+		setContentView(R.layout.activity_main);
+
 		LinearLayoutManager manager = new LinearLayoutManager(
 			MainActivity.this,
 			LinearLayoutManager.VERTICAL,
 			false
 		);
 
-		mRecyclerView = (RecyclerView) findViewById(R.id.listView);
+		final RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.listView);
 		mRecyclerView.setLayoutManager(manager);
 		mRecyclerView.setHasFixedSize(true);
 
@@ -55,20 +63,47 @@ public class MainActivity extends AppCompatActivity {
 		mRecyclerView.setAdapter(mAdapter);
 	}
 
-	private void loadRepos(Retrofit retrofit) {
-		QiitaService qiitaService = retrofit.create(QiitaService.class);
-		qiitaService.items("android", null, null)
+	private void loadItems(String query) {
+		query = (query == null || query.equals("")) ? "android" : query;
+		QiitaService qiitaService = mRetrofit.create(QiitaService.class);
+		qiitaService.items(query, null, null)
 			.subscribeOn(Schedulers.io())
 			.observeOn(AndroidSchedulers.mainThread())
-			.subscribe(this::render, this::errorHandler);
-	}
-
-	private void errorHandler(Throwable t) {
-		t.printStackTrace();
-		Log.d(TAG, String.valueOf(t));
+			.subscribe(this::render, Timber::e);
 	}
 
 	private void render(List<Item> items) {
 		mAdapter.setList(items);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(final Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.search, menu);
+
+		MenuItem menuItem = menu.findItem(R.id.action_search);
+		final SearchView mSearchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+
+		if (mSearchView == null) {
+			return super.onCreateOptionsMenu(menu);
+		}
+
+		mSearchView.setIconified(true);
+		mSearchView.setSubmitButtonEnabled(false);
+
+		mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+			@Override
+			public boolean onQueryTextSubmit(final String query) {
+				loadItems(query);
+				return true;
+			}
+
+			@Override
+			public boolean onQueryTextChange(final String newText) {
+				return false;
+			}
+		});
+
+		return super.onCreateOptionsMenu(menu);
 	}
 }
