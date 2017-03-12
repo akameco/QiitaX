@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.github.akameco.qiitax.adapter.ItemAdapter;
@@ -25,9 +26,11 @@ import timber.log.Timber;
 public class MainActivity extends AppCompatActivity {
 	public static final String TAG = MainActivity.class.getSimpleName();
 	public static final String API_URL = "https://qiita.com";
+	public static final String STATE_ITEM_LIST = "item_list";
 
 	private ItemAdapter mAdapter;
 	private Retrofit mRetrofit;
+	private ArrayList<Item> itemList;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +44,23 @@ public class MainActivity extends AppCompatActivity {
 			.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 			.build();
 
+		if (savedInstanceState != null) {
+			itemList = savedInstanceState.getParcelableArrayList(STATE_ITEM_LIST);
+		}
+
 		// TODO 前回の値をプリファレンスに保存
 		String firstQuery = "android";
-		loadItems(firstQuery);
+		if (itemList == null || itemList.isEmpty()) {
+			loadItems(firstQuery);
+		} else {
+			render(itemList);
+		}
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putParcelableArrayList(STATE_ITEM_LIST, itemList);
+		super.onSaveInstanceState(outState);
 	}
 
 	private void initView() {
@@ -73,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void render(List<Item> items) {
-		mAdapter.setList(items);
+		itemList = new ArrayList<>(items);
+		mAdapter.setList(itemList);
 	}
 
 	@Override
