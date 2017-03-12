@@ -3,7 +3,8 @@ package io.github.akameco.qiitax.model;
 
 import java.util.ArrayList;
 
-public class Item {
+public class Item extends EasyParcelable {
+	public static final Creator<Item> CREATOR = new EasyCreator<>(Item.class);
 	public String title;
 	public String body;
 	public String rendered_body;

@@ -3,7 +3,8 @@ package io.github.akameco.qiitax.model;
 
 import android.support.annotation.Nullable;
 
-public class User {
+public class User extends EasyParcelable {
+	public static final Creator<User> CREATOR = new EasyCreator<>(User.class);
 	public String id;
 	@Nullable public String name;
 	public String profile_image_url;
