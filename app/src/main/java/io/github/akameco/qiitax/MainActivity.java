@@ -59,8 +59,16 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		outState.putParcelableArrayList(STATE_ITEM_LIST, itemList);
+		storeSaveInstanceState(outState);
 		super.onSaveInstanceState(outState);
+	}
+
+	private void storeSaveInstanceState(Bundle outState) {
+		for (Item item : itemList) {
+			item.body = null;
+			item.rendered_body = null;
+		}
+		outState.putParcelableArrayList(STATE_ITEM_LIST, itemList);
 	}
 
 	private void initView() {
